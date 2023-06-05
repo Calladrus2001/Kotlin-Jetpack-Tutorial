@@ -13,23 +13,58 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.toSize
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
+        }
+    }
+}
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@Composable
+fun GreetingBox() {
+    val ScaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
+    var textFieldVal by remember {
+        mutableStateOf("")
+    }
+    Scaffold(
+        modifier = Modifier.fillMaxSize(), scaffoldState = ScaffoldState
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp, vertical = 12.dp)
+        ) {
+            OutlinedTextField(value = textFieldVal,
+                label = {
+                    Text("Enter your name")
+                },
+                singleLine = true,
+                onValueChange = {
+                    textFieldVal = it
+                })
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {
+                scope.launch {
+                    ScaffoldState.snackbarHostState.showSnackbar("Hello! $textFieldVal")
+                }
+            }) {
+                Text(text = "Greet me")
+            }
 
         }
     }
@@ -43,30 +78,27 @@ fun ColorBox() {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(fraction = 0.5f)
-                .background(color = Color.Red)
-                .clickable { clr.value = Color.Cyan }
-        ) {}
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(fraction = 0.5f)
+            .background(color = Color.Red)
+            .clickable { clr.value = Color.Cyan }) {}
     }
 }
 
 @Composable
 fun ImageCard(
-    painter: Painter, description: String, title: String, _modifier: Modifier = Modifier
+    painter: Painter, description: String, title: String, modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = _modifier
+        modifier = modifier
             .background(color = Color.White)
             .fillMaxWidth(),
         shape = RoundedCornerShape(size = 15.dp),
         elevation = 5.dp,
     ) {
         Box(
-            modifier = Modifier
-                .height(150.dp)
+            modifier = Modifier.height(150.dp)
         ) {
             Image(
                 painter = painter,
@@ -81,8 +113,7 @@ fun ImageCard(
                     .fillMaxSize()
                     .background(
                         brush = Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black),
-                            startY = 290f
+                            colors = listOf(Color.Transparent, Color.Black), startY = 290f
                         )
                     )
             )
